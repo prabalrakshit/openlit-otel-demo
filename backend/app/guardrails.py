@@ -41,7 +41,9 @@ def run_input_guardrails(user_text: str) -> Tuple[str, List[GuardrailResult], bo
 
     if settings.ENABLE_INJECTION_DETECTION:
         for pat in INJECTION_PATTERNS:
-            if re.search(pat, user_text, re.IGNORECASE):
+            # The incoming text is a tuple, since it is a JSON from the front end. Join this to make a string
+            regex_safe_user_text = ' '.join(user_text)
+            if re.search(pat, regex_safe_user_text, re.IGNORECASE):
                 name = "input.prompt_injection"
                 reason = "Prompt injection input detected"
                 record_guardrail(name, "input", "block", reason, pattern=pat)
@@ -49,24 +51,23 @@ def run_input_guardrails(user_text: str) -> Tuple[str, List[GuardrailResult], bo
                 return user_text, results, True
 
     if settings.ENABLE_TOPIC_GATING:
-        lowered = user_text.lower()
+        lowered = regex_safe_user_text.lower()
         for topic in ILLEGAL_TOPICS:
             if topic in lowered:
                 name = "input.illegal_topic"
                 reason = f"Request includes disallowed topic: {topic}"
                 record_guardrail(name, "input", "block", reason, topic=topic)
-                results.append(GuardrailResult(name=name, stage="input", action="block", reason=reason), meta={"topic": topic})
+                results.append(GuardrailResult(name=name, stage="input", action="block", reason=reason, meta={"topic": topic}))
                 return user_text, results, True
 
     if settings.ENABLE_PII_REDACTION:
-        redacted, hits = redact_pii(user_text)
+        redacted, hits = redact_pii(regex_safe_user_text)
         if hits:
             pii = ",".join(hits)
             name = "input.pii_redaction"
             reason = f"Redacted PII Types: {pii}"
             record_guardrail(name, "input", "redact", reason, pii=pii)
-            results.append(GuardrailResult(name=name, stage="input", action="redact", reason=reason),
-                           meta={"types": pii})
+            results.append(GuardrailResult(name=name, stage="input", action="redact", reason=reason, meta={"types": pii}))
     return user_text, results, False
 
 def run_output_guardrails(output_text: str) -> Tuple[List[GuardrailResult], bool, str]:
