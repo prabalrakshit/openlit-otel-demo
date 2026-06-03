@@ -1,0 +1,29 @@
+{
+  "uid": "trip-traces",
+  "title": "Trip Planner - Traces (Tempo)",
+  "tags": [
+    "trip-planner",
+    "tempo",
+    "traces"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "panels": [
+    {
+      "type": "text",
+      "title": "Find a trace",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "1. Run the UI and generate an itinerary.\n2. Copy the returned **trace_id**.\n3. Open Grafana Explore. \u2192 Tempo and paste the trace_id. \n\nIn the trace timeline you should see:\n- `trip_planner.plan` server span\n- `tool.call` spans\n- `guardrail.decision` events"
+      }
+    }
+  ]
+}

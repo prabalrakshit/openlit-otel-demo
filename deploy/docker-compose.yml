@@ -1,0 +1,36 @@
+services:
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3000:3000"
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - ENABLE_LOGS_ALL=true
+    volumes:
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+
+  backend:
+    build: ../backend
+    environment:
+      - ENV=dev
+      - SERVICE_NAME=trip-planner-api
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OTLP_ENDPOINT=http://lgtm:4318
+      - OTLP_HEADERS=
+      - ALLOWED_ORIGINS=http://localhost:3001
+      - MAX_TOOL_CALLS=4
+    ports:
+      - "8000:8000"
+    depends_on:
+      - lgtm
+
+  frontend:
+    build: ../frontend
+    environment:
+      - VITE_API_BASE=http://localhost:8000
+    ports:
+      - "3001:80"
+    depends_on:
+      - backend

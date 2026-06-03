@@ -1,0 +1,70 @@
+{
+  "uid": "trip-guardrails-tools",
+  "title": "Trip Planner: Guardrail and Tools",
+  "tags": [
+    "trip-planner",
+    "guardrails",
+    "tools",
+    "otel"
+  ],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "text",
+      "title": "How to Use",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 4
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "Use the **trace_id** returned by the UI/ API to locate traces in Tempo. \n\nThis dashboard focuses on **guardrail** and **tool** metrics emitted via OpenTelemetry."
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Guardrail blocks (rate)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(guardrail_decisions_total(guardrail_action=\"block\"}[5m]))",
+          "legendFormat": "blocks"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Tool calls (rate) by status",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "Prometheus"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "expr": "sum by (tool_status) (rate(tool_calls_total[5m]))",
+          "legendFormat": "{{tool_status}}"
+        }
+      ]
+    }
+  ]
+}
