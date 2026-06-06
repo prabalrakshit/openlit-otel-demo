@@ -38,15 +38,13 @@ def health():
 def plan(req: TripPlanRequest):
     tracer = trace.get_tracer("trip-planner.api")
     with tracer.start_as_current_span("trip_planner.plan"):
-        user_prompt = (".join(["
-                       f"Origin: {req.origin}",
+        user_prompt = (f"Origin: {req.origin}",
                        f"Destination: {req.destination}",
                        f"Dates: {req.start_date} to {req.end_date}",
                        f"Travelers: {req.travelers}",
                        f"Budget: {req.budget or 'unspecified'}",
                        f"Preferences: {', '.join(req.preferences if req.preferences else 'none')}",
-                       f"Additional Notes: {req.prompt or 'none'}",
-                       "])")
+                       f"Additional Notes: {req.prompt or 'none'}")
         safe_prompt, g_in, blocked = run_input_guardrails(user_prompt)
         if blocked:
             raise HTTPException(status_code=400,
