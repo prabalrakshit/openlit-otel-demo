@@ -16,8 +16,7 @@ ILLEGAL_TOPICS = [
 ]
 
 PII_PATTERNS = {
-    "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"),
-    "phone": re.compile(r"\b(\+?\d[\d\s\-()]{8,}\d)\b"),
+    "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 }
 
 def redact_pii(text: str) -> Tuple[str, List[str]]:
