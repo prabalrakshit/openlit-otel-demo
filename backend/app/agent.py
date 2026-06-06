@@ -35,7 +35,7 @@ def run_agent(user_prompt: str) -> Tuple[str, List[GuardrailResult], List[ToolCa
 
     for _step in range(8):
         resp = client.chat.completions.create(
-            model="gpt-4.1-mini",
+            model="gpt-5-nano",
             messages=messages,
             tools=tools,
         )
