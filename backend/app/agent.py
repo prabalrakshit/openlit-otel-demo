@@ -21,10 +21,12 @@ Return a markdown itinerary with a day-by-day plan.
 
 def run_agent(user_prompt: str) -> Tuple[str, List[GuardrailResult], List[ToolCallRecord]]:
     tools = openai_tools_schema()
+    # The incoming text is a tuple, since it is a JSON from the front end. Join this to make a string
+    regex_safe_user_prompt = ' '.join(user_prompt)
 
     messages: List[Dict[str, Any]] = [
         {"role": "system", "content": SYSTEM_POLICY},
-        {"role": "user", "content": user_prompt},
+        {"role": "user", "content": regex_safe_user_prompt},
     ]
 
     guardrails: List[GuardrailResult] = []

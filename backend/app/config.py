@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     OPENAI_API_KEY: str = ""
 
-    OTLP_ENDPOINT: str = "http:localhost:4318"
+    OTLP_ENDPOINT: str = "http://localhost:4318"
     OTLP_HEADERS: str = ""
 
     MAX_TOOL_CALLS: int = 4
