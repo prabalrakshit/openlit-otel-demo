@@ -11,12 +11,20 @@ tracer = trace.get_tracer("trip-planner.tools")
 
 class WeatherArgs(BaseModel):
     location: str = Field(..., description="City Name")
-
+# The model config section is added to ensure that OpenAI treats travelers as a required field
+# Since we have added a field level default, Pydantic does not think it as required
+# But OpenAI complains if this is not marked as required. It should be either mandatory or removed from the configuration
+# Error Seen: "Invalid schema for function 'search_flights': In context=(), 'required' is required to be supplied and to be an array including every key in properties. Missing 'travelers'."
 class FlightSearchArgs(BaseModel):
     origin: str
     destination: str
     date: str
     travelers: int = Field(1, ge=1, le=20)
+    model_config = {
+        "json_schema_extra": {
+            "required": ["origin", "destination", "date", "travelers"]
+        }
+    }
 
 class BookingArgs(BaseModel):
     vendor: str
