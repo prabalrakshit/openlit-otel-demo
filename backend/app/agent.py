@@ -32,19 +32,27 @@ def run_agent(user_prompt: str) -> Tuple[str, List[GuardrailResult], List[ToolCa
     guardrails: List[GuardrailResult] = []
     tool_records: List[ToolCallRecord] = []
     tool_calls_used = 0
+    max_agent_steps = 8
 
-    for _step in range(8):
+    # Do not use a while (true) and max the number of attempts at 8
+    for _step in range(max_agent_steps):
         resp = client.chat.completions.create(
             model="gpt-5-nano",
             messages=messages,
             tools=tools,
         )
 
+        # Dump the response from OpenAI if you wish to debug
+        # print(json.dumps(resp.model_dump(), indent=2))
+
         msg = resp.choices[0].message
         messages.append({"role": msg.role, "content": msg.content, "tool_calls": msg.tool_calls})
 
+        # If there are no tool calls to be made, return the natural language output
         if not getattr(msg, "tool_calls", None):
             return msg.content or "", guardrails, tool_records
+
+        # If the maximum number of tool calls are executed, proceed with the best possible response without the tools
         if tool_calls_used + len(msg.tool_calls) > settings.MAX_TOOL_CALLS:
             name = "tool.budget"
             reason = f"Exceeded max tool calls ({settings.MAX_TOOL_CALLS})"
@@ -62,6 +70,7 @@ def run_agent(user_prompt: str) -> Tuple[str, List[GuardrailResult], List[ToolCa
             guardrails.extend(g_tool)
             tool_records.append(record)
 
+            # Add the tool output to the messages so that it can be added to the final response
             messages.append({
                 "role": "tool",
                 "tool_call_id": tc.id,
@@ -75,9 +84,9 @@ def run_agent(user_prompt: str) -> Tuple[str, List[GuardrailResult], List[ToolCa
                     "content": "The booking requires user confirmation. Do NOT proceed. Provide alternatives and ask user for confirmation",
                 })
 
-        name = "agent.max_steps"
-        reason = "Reached max agent steps"
-        record_guardrail(name, "execution", "warn", reason)
-        guardrails.append(GuardrailResult(name=name, stage="execution", action="warn", reason=reason))
-        return "I generated a partial plan. Please refine your request.", guardrails, tool_records
-    return None
+
+    name = "agent.max_steps"
+    reason = f"Reached maximum number of agent steps. {max_agent_steps}"
+    record_guardrail(name, "execution", "warn", reason)
+    guardrails.append(GuardrailResult(name=name, stage="execution", action="warn", reason=reason))
+    return "I generated a partial plan. Please refine your request.", guardrails, tool_records
