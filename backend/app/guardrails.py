@@ -1,5 +1,7 @@
 import re
 from typing import List, Tuple
+
+import openlit
 from models import GuardrailResult
 from observability import record_guardrail
 from config import settings
@@ -30,6 +32,10 @@ def redact_pii(text: str) -> Tuple[str, List[str]]:
 
 def run_input_guardrails(user_text: str) -> Tuple[str, List[GuardrailResult], bool]:
     results: List[GuardrailResult] = []
+    #Invoke the default checks provided by OpenLit
+    openlit_guardrails_result = run_openlit_guardrails(user_text)
+    if openlit_guardrails_result:
+        return openlit_guardrails_result
 
     if len(user_text) > 4000:
         name = "input.size_limit"
@@ -90,4 +96,30 @@ def run_output_guardrails(output_text: str) -> Tuple[List[GuardrailResult], bool
         results.append(GuardrailResult(name=name, stage="output", action="warn", reason=reason))
         output_text += "\n\n> Note: Visa/ entry requirements can change. Please verify via official sources. \n"
     return results, False, output_text
+
+def run_openlit_guardrails(input: str) -> Tuple[str, List[GuardrailResult], bool]:
+    results: List[GuardrailResult] = []
+    prefix = "Additional Notes"
+    text_to_be_checked = input
+    if isinstance(input, list) or isinstance(input, tuple):
+        for item in input:
+            if isinstance(item, str) and item.startswith(prefix):
+                text_to_be_checked = item
+                print(text_to_be_checked)
+                break
+    if text_to_be_checked:
+        # Invoke OpenLIT for inbuilt guardrail checks
+        guards = openlit.guard.All(provider="openai", api_key=settings.OPENAI_API_KEY)
+        result = guards.detect(text=text_to_be_checked)
+        if result.verdict.lower() == "yes":
+            reason = result.guard+"|"+result.classification+"|"+result.explanation
+            name = "input.openlit_detection"
+            record_guardrail(name, "input", "block", reason)
+            results.append(GuardrailResult(name=name, stage="input", action="warn", reason=reason))
+            return text_to_be_checked, results, True
+    return None
+
+
+
+
 
