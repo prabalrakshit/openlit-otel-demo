@@ -41,7 +41,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(guardrail_decisions_total(guardrail_action=\"block\"}[5m]))",
+          "expr": "sum(rate(guardrail_decisions_total{guardrail_action=\"block\"}[5m]))",
           "legendFormat": "blocks"
         }
       ]
