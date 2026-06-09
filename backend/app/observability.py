@@ -34,6 +34,7 @@ def init_openlit(service_name: str, environment: str, otlp_endpoint: str, otlp_h
 def record_guardrail(name: str, stage:str, action:str, reason: str, **meta):
     span = trace.get_current_span()
     if span and span.is_recording():
+        print(span)
         span.add_event(
             "guardrail_decision",
             attributes={
