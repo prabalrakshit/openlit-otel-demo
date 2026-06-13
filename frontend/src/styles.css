@@ -1,0 +1,125 @@
+:root{
+  --infosys-blue:#007cc3;
+  --bg:#0b1220;
+  --card:#0f1b2d;
+  --muted:#a9b6c6;
+  --text:#eaf0f7;
+  --border: rgba(255,255,255,0.08);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:ui-sans-serif,system-ui,Segoe UI,Roboto,Arial;
+  background:linear-gradient(180deg,var(--bg),#060a12);
+  color:var(--text)
+}
+.container{
+  max-width:1100px;
+  margin:0 auto;
+  padding:24px
+}
+.topbar{
+  position:sticky;top:0;
+  z-index:10;
+  background:rgba(11,18,32,0.75);
+  backdrop-filter: blur(10px);
+  border-bottom:1px solid var(--border)
+}
+.topbar-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  max-width:1100px;
+  margin:0 auto;
+  padding:14px 24px}
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center
+}
+.logo{
+  width:60px;
+  height:60px;
+  border-radius:12px;
+  background: url('../images/logo.png') no-repeat center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:800
+}
+.brand h1{
+  font-size:20px;
+  margin:0
+}
+.brand span{
+  color:var(--muted);
+  font-size:16px
+}
+.grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px
+}
+
+@media(min-width:900px){
+  .grid{grid-template-columns:1fr 1fr}
+}
+.card{
+  background:rgba(15,27,45,0.75);
+  border:1px solid var(--border);
+  border-radius:20px;padding:16px;
+  box-shadow:0 10px 25px rgba(0, 0, 0, 0.35)
+}
+.label{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px}
+.input,
+.textarea{
+  width:100%;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,0.04);
+  color:var(--text);
+  outline:none
+}
+.textarea{
+  min-height:90px;
+  resize:vertical
+}
+.btn{
+  padding:10px 14px;
+  border-radius:14px;
+  border:1px solid rgba(56,189,248,0.35);
+  background:linear-gradient(135deg,var(--infosys-blue),#2563eb);
+  color:white;font-weight:700;
+  cursor:pointer
+}
+.btn:disabled{
+  opacity:0.6;
+  cursor:not-allowed
+}
+.pill{
+  display:inline-flex;
+  gap:8px;
+  align-items:center;
+  border:1px solid var(--border);
+  padding:8px 10px;
+  border-radius:999px;
+  color:var(--muted);
+  font-size:12px
+}
+pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  background:rgba(0,0,0,0.25);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:12px;
+  overflow:auto
+}
+.small{
+  font-size:12px;
+  color:var(--muted)
+}
